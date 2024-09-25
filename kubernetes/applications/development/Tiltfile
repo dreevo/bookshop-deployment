@@ -1,0 +1,3 @@
+include('/Users/dreevo/Documents/workshop/bookshop/bookshop-config-service/Tiltfile')
+include('/Users/dreevo/Documents/workshop/bookshop/bookshop-catalog-service/Tiltfile')
+update_settings(max_parallel_updates=1)
