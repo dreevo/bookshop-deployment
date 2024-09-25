@@ -1,4 +1,6 @@
 include('/Users/dreevo/Documents/workshop/bookshop/bookshop-config-service/Tiltfile')
 include('/Users/dreevo/Documents/workshop/bookshop/bookshop-catalog-service/Tiltfile')
 include('/Users/dreevo/Documents/workshop/bookshop/bookshop-order-service/Tiltfile')
+include('/Users/dreevo/Documents/workshop/bookshop/bookshop-dispatcher-service/Tiltfile')
+include('/Users/dreevo/Documents/workshop/bookshop/bookshop-edge-service/Tiltfile')
 update_settings(max_parallel_updates=1)
