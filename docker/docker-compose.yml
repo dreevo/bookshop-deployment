@@ -19,6 +19,7 @@ services:
   bookshop-order-service:
     depends_on:
       - bookshop-postgres
+      - bookshop-rabbitmq
     image: "bookshop-order-service"
     container_name: "bookshop-order-service"
     ports:
@@ -27,10 +28,11 @@ services:
     environment:
       - BPL_DEBUG_ENABLED=true
       - BPL_DEBUG_PORT=8002
-      - BOOKSHOP_CATALOG_SERVICE_URI=http://bookshop-catalog-service:9001
+      - BOOKSHOP_BOOKSHOP_CATALOG_SERVICE_URI=http://bookshop-catalog-service:9001
       - SPRING_CLOUD_CONFIG_URI=http://bookshop-config-service:8888
       - SPRING_R2DBC_URL=r2dbc:postgresql://bookshop-postgres:5432/bookshopdb_order
       - SPRING_FLYWAY_URL=jdbc:postgresql://bookshop-postgres:5432/bookshopdb_order
+      - SPRING_RABBITMQ_HOST=bookshop-rabbitmq
 
   bookshop-dispatcher-service:
     depends_on:
