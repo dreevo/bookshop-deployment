@@ -1,0 +1,3 @@
+for mac users add this to hosts file in order to resolve keycloak for both kubernetes cluster and docker network
+192.168.1.12 host.docker.internal // this is your local ip
+127.0.0.1 bookshop-keycloak

@@ -51,6 +51,8 @@ services:
   bookshop-edge-service:
     depends_on:
       - bookshop-redis
+      - bookshop-keycloak
+      - bookshop-ui
     image: "bookshop-edge-service"
     container_name: "bookshop-edge-service"
     ports:
@@ -63,6 +65,8 @@ services:
       - BOOKSHOP_ORDER_SERVICE_URL=http://bookshop-order-service:9002
       - SPRING_CLOUD_CONFIG_URI=http://bookshop-config-service:8888
       - SPRING_REDIS_HOST=bookshop-redis
+      - SPA_URL=http://bookshop-ui:9004
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI=http://host.docker.internal:8080/realms/bookshop
 
   bookshop-config-service:
     image: "bookshop-config-service"
@@ -103,3 +107,23 @@ services:
       - 15672:15672
     volumes:
       - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+
+  bookshop-keycloak:
+    image: quay.io/keycloak/keycloak:19.0
+    container_name: "bookshop-keycloak"
+    command: start-dev --import-realm
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    environment:
+      - KEYCLOAK_ADMIN=user
+      - KEYCLOAK_ADMIN_PASSWORD=password
+    ports:
+      - 8080:8080
+
+  bookshop-ui:
+    image: "bookshop-ui"
+    container_name: "bookshop-ui"
+    ports:
+      - 9004:9004
+    environment:
+      - PORT=9004
