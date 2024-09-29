@@ -2,6 +2,8 @@ version: "3.8"
 services:
   bookshop-catalog-service:
     depends_on:
+      - fluent-bit
+      - bookshop-keycloak
       - bookshop-postgres
     image: "bookshop-catalog-service"
     container_name: "bookshop-catalog-service"
@@ -16,10 +18,15 @@ services:
       - SPRING_PROFILES_ACTIVE=testdata
       - SPRING_CLOUD_CONFIG_URI=http://bookshop-config-service:8888
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://host.docker.internal:8080/realms/bookshop
-
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: 127.0.0.1:24224
 
   bookshop-order-service:
     depends_on:
+      - fluent-bit
+      - bookshop-keycloak
       - bookshop-postgres
       - bookshop-rabbitmq
     image: "bookshop-order-service"
@@ -39,6 +46,7 @@ services:
 
   bookshop-dispatcher-service:
     depends_on:
+      - fluent-bit
       - bookshop-rabbitmq
     image: "bookshop-dispatcher-service"
     container_name: bookshop-dispatcher-service
@@ -53,6 +61,7 @@ services:
 
   bookshop-edge-service:
     depends_on:
+      - fluent-bit
       - bookshop-redis
       - bookshop-keycloak
       - bookshop-ui
@@ -72,6 +81,8 @@ services:
       - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI=http://host.docker.internal:8080/realms/bookshop
 
   bookshop-config-service:
+    depends_on:
+      - fluent-bit
     image: "bookshop-config-service"
     container_name: "bookshop-config-service"
     ports:
@@ -124,9 +135,44 @@ services:
       - 8080:8080
 
   bookshop-ui:
+    depends_on:
+      - fluent-bit
     image: "bookshop-ui"
     container_name: "bookshop-ui"
     ports:
       - 9004:9004
     environment:
       - PORT=9004
+
+  grafana:
+    image: grafana/grafana:9.1.2
+    container_name: grafana
+    depends_on:
+      - loki
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=user
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    volumes:
+      - ./observability/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - ./observability/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./observability/grafana/grafana.ini:/etc/grafana/grafana.ini
+
+  loki:
+    image: grafana/loki:2.6.1
+    container_name: loki
+    depends_on:
+      - fluent-bit
+    ports:
+      - "3100:3100"
+
+  fluent-bit:
+    image: grafana/fluent-bit-plugin-loki:2.6.1-amd64
+    container_name: fluent-bit
+    ports:
+      - "24224:24224"
+    environment:
+      - LOKI_URL=http://loki:3100/loki/api/v1/push
+    volumes:
+      - ./observability/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf

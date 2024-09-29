@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 2s
+
+scrape_configs:
+  - job_name: 'bookshop-edge-service'
+    scrape_interval: 2s
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'bookshop-edge-service:9000' ]
+  - job_name: 'bookshop-catalog-service'
+    scrape_interval: 2s
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'bookshop-catalog-service:9001' ]
+  - job_name: 'bookshop-order-service'
+    scrape_interval: 2s
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'bookshop-order-service:9002' ]
+  - job_name: 'bookshop-dispatcher-service'
+    scrape_interval: 2s
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'bookshop-dispatcher-service:9003' ]
+  - job_name: 'bookshop-config-service'
+    scrape_interval: 2s
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'bookshop-config-service:8888' ]
+  
